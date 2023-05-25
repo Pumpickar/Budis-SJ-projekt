@@ -5,7 +5,7 @@ include 'functions/DB.php';
 
 // pridať check či som admin
 if (!isset($_SESSION['valid']) || $_SESSION['role'] !== 'admin') {
-    header("Location: index.php"); /
+    header("Location: index.php");
     exit();
 }
 

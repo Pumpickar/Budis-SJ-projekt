@@ -2,7 +2,7 @@
 
 session_start();
 
-include("functions/DB.php");
+include("DB.php");
 
 if (isset($_POST['message'])) {
     $message = mysqli_real_escape_string($connection, $_POST['message']);
