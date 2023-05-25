@@ -1,74 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
+include 'casti_stranky/bootstrap_atd.php';
+include 'casti_stranky/header.php';
 
-  <head>
+include 'functions/DB.php';
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+if (isset($_POST['submit'])) {
+    $user = mysqli_real_escape_string($connection, $_POST['username']);
+    $pass = mysqli_real_escape_string($connection, $_POST['password']);
 
-    <title>Sixteen Clothing - About Page</title>
+    if ($user == "" || $pass == "") {
+        echo "<div class='center'>";
+        echo "Všetky polia musia byť vyplnené.";
+        echo "<br/>";
+        echo "<a href='login.php'>Krok späť</a>";
+        echo "</div>";
+    } else {
+        $result = mysqli_query($connection, "SELECT * FROM user WHERE username='$user' AND password=md5('$pass')")
+            or die("select nefunguje");
 
-    <!-- Bootstrap core CSS -->
-    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<!--
+        if (mysqli_num_rows($result) == 1) {
+            $row = mysqli_fetch_assoc($result);
+            $_SESSION['id'] = $row['id'];
+            $_SESSION['iduser'] = $row['iduser'];
+            $_SESSION['valid'] = true;
+            $_SESSION['name'] = $row['name'];
 
-TemplateMo 546 Sixteen Clothing
+            if ($row['is_admin'] == 1) {
+                $_SESSION['role'] = 'admin';
 
-https://templatemo.com/tm-546-sixteen-clothing
+                $cookie_name = "login_session";
+                $cookie_value = session_id();
+                $cookie_expiry = time() + (259200);
+                $cookie_path = '/';
+                setcookie($cookie_name, $cookie_value, $cookie_expiry, $cookie_path);
 
--->
+                header('Location: admin.php');
+                exit();
+            } else {
+                $_SESSION['role'] = 'user';
 
-    <!-- Additional CSS Files -->
-    <link rel="stylesheet" href="assets/css/fontawesome.css">
-    <link rel="stylesheet" href="assets/css/templatemo-sixteen.css">
-    <link rel="stylesheet" href="assets/css/owl.css">
+                $cookie_name = "login_session";
+                $cookie_value = session_id();
+                $cookie_expiry = time() + (259200);
+                $cookie_path = '/';
+                setcookie($cookie_name, $cookie_value, $cookie_expiry, $cookie_path);
 
-  </head>
+                header('Location: index.php');
+                exit();
+            }
+        } else {
+            echo "<div class='center'>";
+            echo "Nesprávne meno alebo heslo";
+            echo "<br/>";
+            echo "<a href='login.php'>Krok späť</a>";
+            echo "</div>";
+        }
+    }
+}
+?>
 
-  <body>
 
-    <!-- ***** Preloader Start ***** -->
-    <div id="preloader">
-        <div class="jumper">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
-    </div>  
-    <!-- ***** Preloader End ***** -->
+<style>
+    .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+</style>
 
-    <!-- Header -->
-    <header class="">
-      <nav class="navbar navbar-expand-lg">
-        <div class="container">
-          <a class="navbar-brand" href="index.php"><h2>Sixteen <em>Clothing</em></h2></a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="index.php">Home
-                  <span class="sr-only">(current)</span>
-                </a>
-              </li> 
-              <li class="nav-item">
-                <a class="nav-link" href="products.php">Our Products</a>
-              </li>
-              <li class="nav-item active">
-                <a class="nav-link" href="about.php">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="contact.php">Contact Us</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="login.php">Login</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+<div class="center">
+    <form name="form1" method="post" action="">
+        <table width="75%" border="0">
+            <tr>
+                <td width="10%">Username</td>
+                <td><input type="text" name="username"></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input type="password" name="password"></td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td><input type="submit" name="submit" value="Submit"></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<?php
+include 'casti_stranky/footer.php';
+include 'casti_stranky/JS.php';
+?>
